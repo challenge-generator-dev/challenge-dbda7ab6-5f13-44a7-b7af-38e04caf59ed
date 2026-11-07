@@ -1,0 +1,114 @@
+# =============================================================================
+# Variables de configuración para el entorno de DESARROLLO
+# E-commerce Orders API - DynamoDB CRUD
+# =============================================================================
+# Este archivo define los valores específicos para el entorno de desarrollo.
+# NO committing este archivo al repositorio si contiene valores sensibles.
+# Copia terraform.tfvars.example a este archivo y personaliza.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Configuración de AWS - Entorno de Desarrollo
+# -----------------------------------------------------------------------------
+
+# Región de AWS para desarrollo (us-east-1 es la más común para demos)
+aws_region = "us-east-1"
+
+# Usar credenciales por defecto del perfil default de AWS CLI
+# Para desarrollo local, asegúrate de tener AWS CLI configurado:
+# aws configure
+# O establece variables de entorno:
+# export AWS_ACCESS_KEY_ID="tu-access-key"
+# export AWS_SECRET_ACCESS_KEY="tu-secret-key"
+
+# -----------------------------------------------------------------------------
+# Configuración de DynamoDB - Tabla de Órdenes (DEV)
+# -----------------------------------------------------------------------------
+
+# Nombre de la tabla - sufjo -dev para distinguir de otros entornos
+dynamodb_table_name = "ecommerce-orders-dev"
+
+# Modo de facturación PAY_PER_REQUEST es ideal para desarrollo
+# porque solo paga por las solicitudes realizadas sin costo mínimo
+dynamodb_billing_mode = "PAY_PER_REQUEST"
+
+# capacidades aprovisionadas (solo se usan si billing_mode = PROVISIONED)
+dynamodb_read_capacity = 2
+dynamodb_write_capacity = 2
+
+# Point-in-time recovery es útil en dev para pruebas de restauración
+dynamodb_pit_recovery_enabled = true
+
+# TTL para órdenes expiradas - 30 días en segundos
+# 30 días = 30 * 24 * 60 * 60 = 2592000 segundos
+dynamodb_ttl_attribute = "expiration_time"
+
+# -----------------------------------------------------------------------------
+# Configuración de etiquetas (tags) - Desarrollo
+# -----------------------------------------------------------------------------
+
+# Entorno específico para desarrollo
+environment = "dev"
+
+# Nombre del proyecto
+project_name = "ecommerce-orders-api"
+
+# Propietario del módulo
+project_owner = "platform-team"
+
+# Centro de costos para tracking
+cost_center = "ecommerce-platform-dev"
+
+# -----------------------------------------------------------------------------
+# Configuración de red - Desarrollo
+# -----------------------------------------------------------------------------
+
+# En desarrollo usamos acceso público a DynamoDB
+# No se requiere VPC endpoint para desarrollo local
+# vpc_id = "" (dejar vacío)
+
+# -----------------------------------------------------------------------------
+# Configuración de seguridad - Desarrollo
+# -----------------------------------------------------------------------------
+
+# Habilitar cifrado (recomendado incluso en dev)
+enable_dynamodb_encryption = true
+
+# Usar la clave gestionada por AWS por defecto
+# Para desarrollo no necesitamos KMS personalizado
+# kms_key_id = "alias/aws/dynamodb"
+
+# -----------------------------------------------------------------------------
+# Configuración de logging - Desarrollo
+# -----------------------------------------------------------------------------
+
+# Habilitar logging para monitoreo de queries
+enable_logging = true
+
+# Nivel de logging INFO para desarrollo (ERROR en producción)
+log_level = "INFO"
+
+# Menos días de retención en dev para ahorrar costos
+log_retention_days = 7
+
+# -----------------------------------------------------------------------------
+# Notas de uso para desarrollo
+# -----------------------------------------------------------------------------
+#
+# Este entorno está configurado para desarrollo rápido con:
+# - PAY_PER_REQUEST: sin costo fijo, paga por uso
+# - PITR habilitado: permite pruebas de restore
+# - Logging activo: para debugging de queries
+# - TTL configurado: limpieza automática de datos de prueba
+#
+# Para reiniciar la tabla de desarrollo:
+#   terraform destroy -var-file=environments/dev/terraform.tfvars
+#   terraform apply -var-file=environments/dev/terraform.tfvars
+#
+# Para verificar el estado de la tabla:
+#   aws dynamodb describe-table --table-name ecommerce-orders-dev --region us-east-1
+#
+# Para listar tablas:
+#   aws dynamodb list-tables --region us-east-1
+#
+# -----------------------------------------------------------------------------
